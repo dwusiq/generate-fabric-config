@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.wusiq.fabric.config.configx.ChannelConfig;
 import com.wusiq.fabric.config.configx.SimpleOrgConfig;
 import com.wusiq.fabric.config.configx.SimplePolicy;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import static com.wusiq.fabric.Constant.*;
 
 @Service
 public class YamlService {
-    ThreadLocal<Yaml> threadLocal = ThreadLocal.withInitial(() -> new Yaml());
 
     public void writeYaml() throws IOException {
 //        Policy policies = new Policy();
@@ -31,21 +31,24 @@ public class YamlService {
         policies.put(POLICY_AUTHORITY_WRITERS, SimplePolicy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ORG_MEMBER));
         policies.put(POLICY_AUTHORITY_ADMINS, SimplePolicy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN));
 
-
         SimpleOrgConfig ordererSimpleOrgConfig = new SimpleOrgConfig();
         ordererSimpleOrgConfig.setName("OrdererOrg");
         ordererSimpleOrgConfig.setID("OrdererMSP");
         ordererSimpleOrgConfig.setMSPDir("crypto-config/ordererOrganizations/example.com/msp");
         ordererSimpleOrgConfig.setPolicies(policies);
 
-        Yaml yaml = threadLocal.get();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String prettyJSONString = objectMapper.writeValueAsString(ordererSimpleOrgConfig);
-        // String prettyJSONString = JacksonUtils.objToString(OrdererOrg);
-        // mapping
-        LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) yaml.load(prettyJSONString);
-        // convert to yaml string (yaml formatted string)
+        Map<String, Boolean> capabilities = new LinkedHashMap<>();
+        capabilities.put("V1_4_2",true);
+
+        ChannelConfig channelConfig = new ChannelConfig();
+        channelConfig.setConsortium("SampleConsortium");
+        channelConfig.setPolicies(policies);
+        channelConfig.setCapabilities(capabilities);
+
+
+        Map<String, ChannelConfig> channelConfigYaml = new LinkedHashMap<>();
+        channelConfigYaml.put("TwoOrgsChannel",channelConfig);
 
         File file = new File("./configs/configx.yaml");
         // 创建文件
@@ -56,7 +59,7 @@ public class YamlService {
 
         // String str = yaml.dump(map);
 
-        String jsonAsYaml = new YAMLMapper().writeValueAsString(ordererSimpleOrgConfig);
+        String jsonAsYaml = new YAMLMapper().writeValueAsString(channelConfigYaml);
 
         //用snakeyaml的dump方法将map类解析成yaml内容
         writer.write(jsonAsYaml);
