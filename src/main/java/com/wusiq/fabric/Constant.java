@@ -18,10 +18,10 @@ public class Constant {
     public static final String POLICY_TYPE_IMPLICIT_META = PolicyTypeEnum.IMPLICIT_META.getValue();
 
     //RULE:SIGNATURE
-    public static final String POLICY_RULE_OR_ORG_MEMBER = "OR('OrdererMSP.member')";
-    public static final String POLICY_RULE_OR_ADMIN_PEER_CLIENT = "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')";
-    public static final String POLICY_RULE_OR_ADMIN_CLIENT = "OR('Org2MSP.admin', 'Org2MSP.client')";
-    public static final String POLICY_RULE_OR_ADMIN = "OR(Org2MSP.admin)";
+    public static final String POLICY_RULE_OR_ORG_MEMBER = "OR('OrgName.member')";
+    public static final String POLICY_RULE_OR_ADMIN_PEER_CLIENT = "OR('OrgName.admin', 'OrgName.peer', 'OrgName.client')";
+    public static final String POLICY_RULE_OR_ADMIN_CLIENT = "OR('OrgName.admin', 'OrgName.client')";
+    public static final String POLICY_RULE_OR_ADMIN = "OR(OrgName.admin)";
 
     //RULE:IMPLICIT_META
     public static final String POLICY_RULE_IMPLICIT_META_ANY_READERS = "ANY Readers";

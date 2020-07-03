@@ -5,4 +5,10 @@ MSPDir: "crypto-config/ordererOrganizations/example.com/msp"
 Policies:
   Readers:
     Type: "Signature"
-    Rule: "OR(Org2MSP.admin)"
+    Rule: "OR('OrgName.member')"
+  Writers:
+    Type: "Signature"
+    Rule: "OR('OrgName.member')"
+  Admins:
+    Type: "Signature"
+    Rule: "OR(OrgName.admin)"
