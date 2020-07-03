@@ -1,0 +1,8 @@
+---
+Name: "OrdererOrg"
+ID: "OrdererMSP"
+MSPDir: "crypto-config/ordererOrganizations/example.com/msp"
+Policies:
+  Readers:
+    Type: "Signature"
+    Rule: "OR(Org2MSP.admin)"
