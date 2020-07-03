@@ -8,9 +8,9 @@ public class Constant {
 
     // PolicyAuthority
     public static final String POLICY_AUTHORITY_READERS = PolicyAuthorityEnum.READERS.getValue();
-    public static final String POLICY_AUTHORITY_WRITERS = PolicyAuthorityEnum.READERS.getValue();
-    public static final String POLICY_AUTHORITY_ADMINS = PolicyAuthorityEnum.READERS.getValue();
-    public static final String POLICY_AUTHORITY_BLOCK_VALIDATION = PolicyAuthorityEnum.READERS.getValue();
+    public static final String POLICY_AUTHORITY_WRITERS = PolicyAuthorityEnum.WRITERS.getValue();
+    public static final String POLICY_AUTHORITY_ADMINS = PolicyAuthorityEnum.ADMINS.getValue();
+    public static final String POLICY_AUTHORITY_BLOCK_VALIDATION = PolicyAuthorityEnum.BLOCK_VALIDATION.getValue();
 
 
     // PolicyType
