@@ -3,7 +3,6 @@ package com.wusiq.fabric.config.configx;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,4 +18,6 @@ public class OrdererGenesis {
     private Orderer orderer;
     @JsonProperty(value = "Consortiums")
     private Map<String, Consortium> consortiums;
+    @JsonProperty(value = "Application")
+    private Application application;
 }

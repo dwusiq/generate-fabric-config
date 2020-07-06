@@ -2,6 +2,7 @@ package com.wusiq.fabric;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.wusiq.fabric.config.configx.*;
+import com.wusiq.fabric.config.configx.factory.OrdererGenesisFactory;
 import com.wusiq.fabric.config.configx.factory.PolicyFactory;
 import com.wusiq.fabric.enums.OrdererTypeEnum;
 import org.springframework.stereotype.Service;
@@ -139,7 +140,7 @@ public class YamlService {
         List<Organization> organizationList = YamlService.getOrgConfig();
 
         Profiles profiles = new Profiles();
-        profiles.setOrdererGenesis(YamlService.getOrdererGenesis(organizationList));
+        profiles.setSoloOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.SOLO,organizationList));
         profiles.setChannelConfig(YamlService.getChannel(organizationList));
         return profiles;
     }

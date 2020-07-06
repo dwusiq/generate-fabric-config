@@ -8,8 +8,8 @@ import lombok.Data;
  */
 @Data
 public class Profiles {
-    @JsonProperty(value = "ordererGenesis")
-    private OrdererGenesis OrdererGenesis;
+    @JsonProperty(value = "SoloOrdererGenesis")
+    private OrdererGenesis soloOrdererGenesis;
     @JsonProperty(value = "ChannelConfig")
     private Channel channelConfig;
 }

@@ -5,7 +5,7 @@ package com.wusiq.fabric.enums;
 public enum OrdererTypeEnum {
     SOLO("solo"),
     KAFKA("kafka"),
-    ETCDRAFT("EtcdRaft");
+    ETCDRAFT("etcdraft");
 
     String value;
 
