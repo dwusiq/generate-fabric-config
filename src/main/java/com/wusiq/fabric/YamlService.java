@@ -1,99 +1,105 @@
 package com.wusiq.fabric;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.wusiq.fabric.config.configx.ChannelConfig;
-import com.wusiq.fabric.config.configx.SimpleOrgConfig;
-import com.wusiq.fabric.config.configx.SimplePolicy;
+import com.wusiq.fabric.config.configx.Application;
+import com.wusiq.fabric.config.configx.Channel;
+import com.wusiq.fabric.config.configx.Node;
+import com.wusiq.fabric.config.configx.Organization;
+import com.wusiq.fabric.config.configx.factory.PolicyFactory;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
-import static com.wusiq.fabric.Constant.*;
 
 @Service
 public class YamlService {
 
-    public void writeYaml() throws IOException {
-//        Policy policies = new Policy();
-//        policies.setReaders(Constant.POLICY_TYPE_SIGNATURE, Constant.POLICY_RULE_OR_ORG_MEMBER);
-//        policies.setWriters(Constant.POLICY_TYPE_SIGNATURE, Constant.POLICY_RULE_OR_ORG_MEMBER);
-//        policies.setAdmins(Constant.POLICY_TYPE_SIGNATURE, Constant.POLICY_RULE_OR_ADMIN);
+    public void writeConfigx() throws IOException {
+
+        //init application config
+        Application application = new Application();
+        application.setPolicies(PolicyFactory.getDefaultApplicationPolicy());
+        application.setOrganizations(YamlService.getOrgConfig());
+        application.setCapabilities(YamlService.getCommCapabilities());
+
+        //init channel config
+        Channel channel = new Channel();
+        channel.setConsortium("SampleConsortium");
+        channel.setPolicies(PolicyFactory.getDefaultChannelPolicy());
+        channel.setCapabilities(YamlService.getCommCapabilities());
+        channel.setApplication(application);
 
 
-        Map<String, SimplePolicy> policies = new LinkedHashMap<>();
-        policies.put(POLICY_AUTHORITY_READERS, SimplePolicy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ORG_MEMBER));
-        policies.put(POLICY_AUTHORITY_WRITERS, SimplePolicy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ORG_MEMBER));
-        policies.put(POLICY_AUTHORITY_ADMINS, SimplePolicy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN));
+        Map<String, Channel> channelConfigYaml = new LinkedHashMap<>();
+        channelConfigYaml.put("TwoOrgsChannel", channel);
 
-        SimpleOrgConfig ordererSimpleOrgConfig = new SimpleOrgConfig();
-        ordererSimpleOrgConfig.setName("OrdererOrg");
-        ordererSimpleOrgConfig.setID("OrdererMSP");
-        ordererSimpleOrgConfig.setMSPDir("crypto-config/ordererOrganizations/example.com/msp");
-        ordererSimpleOrgConfig.setPolicies(policies);
+        String yamlPath = "./configs/configx.yaml";
+        YamlService.writeYaml(channelConfigYaml, yamlPath);
+    }
 
-
-        Map<String, Boolean> capabilities = new LinkedHashMap<>();
-        capabilities.put("V1_4_2",true);
-
-        ChannelConfig channelConfig = new ChannelConfig();
-        channelConfig.setConsortium("SampleConsortium");
-        channelConfig.setPolicies(policies);
-        channelConfig.setCapabilities(capabilities);
-
-
-        Map<String, ChannelConfig> channelConfigYaml = new LinkedHashMap<>();
-        channelConfigYaml.put("TwoOrgsChannel",channelConfig);
-
-        File file = new File("./configs/configx.yaml");
+    public static void writeYaml(Map<String, Channel> channelConfigYaml, String filepath) throws IOException {
+        File file = new File(filepath);
         // 创建文件
         file.createNewFile();
         // creates a FileWriter Object
         FileWriter writer = new FileWriter(file);
-        //   yaml.dump(prettyJSONString, writer);
-
-        // String str = yaml.dump(map);
-
         String jsonAsYaml = new YAMLMapper().writeValueAsString(channelConfigYaml);
 
-        //用snakeyaml的dump方法将map类解析成yaml内容
         writer.write(jsonAsYaml);
+
         //写入到文件中
         writer.flush();
         writer.close();
-
     }
 
+    public static List<Organization> getOrgConfig() {
+        Organization org1 = new Organization();
+        String orgName = "Org1MSP";
+        String anchorPeersHost = "peer0.org1.example.com";
+        int anchorPeersPort = 7051;
+        String orgId = "Org1MSP";
+        String mSPDir = "crypto-config/peerOrganizations/org1.example.com/msp";
+        org1.setName(orgName);
+        org1.setId(orgId);
+        org1.setMspDir(mSPDir);
+        org1.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
+        org1.setAnchorPeers(Arrays.asList(new Node(anchorPeersHost, anchorPeersPort)));
 
-    public void readYaml() throws FileNotFoundException {
-        //初始化Yaml解析器
-        Yaml yaml = new Yaml();
-        File f = new File("./configs/configx.yaml");
-        //读入文件
-        Object result = yaml.load(new FileInputStream(f));
-        System.out.println(result.getClass());
-        System.out.println(result);
+        orgName = "Org2MSP";
+        anchorPeersHost = "peer0.org2.example.com";
+        anchorPeersPort = 7051;
+        orgId = "Org2MSP";
+        mSPDir = "crypto-config/peerOrganizations/org2.example.com/msp";
+        Organization org2 = new Organization();
+        org2.setName(orgName);
+        org2.setId(orgId);
+        org2.setMspDir(mSPDir);
+        org2.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
+        org2.setAnchorPeers(Arrays.asList(new Node(anchorPeersHost, anchorPeersPort)));
+
+        return Arrays.asList(org1, org2);
     }
 
-
-    public String asYaml(String jsonString) throws JsonProcessingException, IOException {
-        // parse JSON
-        JsonNode jsonNodeTree = new ObjectMapper().readTree(jsonString);
-        // save it as YAML
-        String jsonAsYaml = new YAMLMapper().writeValueAsString(jsonNodeTree);
-        return jsonAsYaml;
+    /**
+     * get common  capabilities.
+     *
+     * @return
+     */
+    public static Map getCommCapabilities() {
+        LinkedHashMap<String, Boolean> map = new LinkedHashMap();
+        map.put("V1_4_2", true);
+        return map;
     }
-
 
     public static void main(String args[]) {
         YamlService yamlService = new YamlService();
         try {
-            yamlService.writeYaml();
+            yamlService.writeConfigx();
             // yamlService.readYaml();
         } catch (IOException e) {
             e.printStackTrace();
