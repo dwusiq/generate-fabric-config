@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Node {
+public class Address {
     @JsonProperty(value = "Host")
     private String host;
     @JsonProperty(value = "Port")

@@ -47,4 +47,30 @@ public class PolicyFactory {
         policies.put(POLICY_AUTHORITY_ADMINS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN.replace("MspID",mapId)));
         return policies;
     }
+
+
+    /**
+     * get default config of OrdererGenesis policy.
+     * @return
+     */
+    public static Map<String, Policy> getDefaultOrdererGenesisPolicy() {
+        Map<String, Policy> policies = new LinkedHashMap<>();
+        policies.put(POLICY_AUTHORITY_READERS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_ANY_READERS));
+        policies.put(POLICY_AUTHORITY_WRITERS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_ANY_WRITERS));
+        policies.put(POLICY_AUTHORITY_ADMINS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_MAJORITY_ADMINS));
+        return policies;
+    }
+
+    /**
+     * get default config of Orderer policy.
+     * @return
+     */
+    public static Map<String, Policy> getDefaultOrdererPolicy() {
+        Map<String, Policy> policies = new LinkedHashMap<>();
+        policies.put(POLICY_AUTHORITY_READERS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_ANY_READERS));
+        policies.put(POLICY_AUTHORITY_WRITERS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_ANY_WRITERS));
+        policies.put(POLICY_AUTHORITY_ADMINS, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_MAJORITY_ADMINS));
+        policies.put(POLICY_AUTHORITY_BLOCK_VALIDATION, Policy.init(POLICY_TYPE_IMPLICIT_META, POLICY_RULE_IMPLICIT_META_ANY_WRITERS));
+        return policies;
+    }
 }

@@ -1,5 +1,8 @@
 package com.wusiq.fabric.enums;
 
+/**
+ * Policy Authority.
+ */
 public enum PolicyAuthorityEnum {
     READERS("Readers"),
     WRITERS("Writers"),

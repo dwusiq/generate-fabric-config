@@ -1,48 +1,27 @@
 package com.wusiq.fabric;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.wusiq.fabric.config.configx.Application;
-import com.wusiq.fabric.config.configx.Channel;
-import com.wusiq.fabric.config.configx.Node;
-import com.wusiq.fabric.config.configx.Organization;
+import com.wusiq.fabric.config.configx.*;
 import com.wusiq.fabric.config.configx.factory.PolicyFactory;
+import com.wusiq.fabric.enums.OrdererTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class YamlService {
 
     public void writeConfigx() throws IOException {
-
-        //init application config
-        Application application = new Application();
-        application.setPolicies(PolicyFactory.getDefaultApplicationPolicy());
-        application.setOrganizations(YamlService.getOrgConfig());
-        application.setCapabilities(YamlService.getCommCapabilities());
-
-        //init channel config
-        Channel channel = new Channel();
-        channel.setConsortium("SampleConsortium");
-        channel.setPolicies(PolicyFactory.getDefaultChannelPolicy());
-        channel.setCapabilities(YamlService.getCommCapabilities());
-        channel.setApplication(application);
-
-
-        Map<String, Channel> channelConfigYaml = new LinkedHashMap<>();
-        channelConfigYaml.put("TwoOrgsChannel", channel);
+        Map<String, Object> configxYaml = YamlService.getConfigx();
 
         String yamlPath = "./configs/configx.yaml";
-        YamlService.writeYaml(channelConfigYaml, yamlPath);
+        YamlService.writeYaml(configxYaml, yamlPath);
     }
 
-    public static void writeYaml(Map<String, Channel> channelConfigYaml, String filepath) throws IOException {
+    public static void writeYaml(Map<String, Object> channelConfigYaml, String filepath) throws IOException {
         File file = new File(filepath);
         // 创建文件
         file.createNewFile();
@@ -68,7 +47,7 @@ public class YamlService {
         org1.setId(orgId);
         org1.setMspDir(mSPDir);
         org1.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
-        org1.setAnchorPeers(Arrays.asList(new Node(anchorPeersHost, anchorPeersPort)));
+        org1.setAnchorPeers(Arrays.asList(new Address(anchorPeersHost, anchorPeersPort)));
 
         orgName = "Org2MSP";
         anchorPeersHost = "peer0.org2.example.com";
@@ -80,7 +59,7 @@ public class YamlService {
         org2.setId(orgId);
         org2.setMspDir(mSPDir);
         org2.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
-        org2.setAnchorPeers(Arrays.asList(new Node(anchorPeersHost, anchorPeersPort)));
+        org2.setAnchorPeers(Arrays.asList(new Address(anchorPeersHost, anchorPeersPort)));
 
         return Arrays.asList(org1, org2);
     }
@@ -94,6 +73,83 @@ public class YamlService {
         LinkedHashMap<String, Boolean> map = new LinkedHashMap();
         map.put("V1_4_2", true);
         return map;
+    }
+
+    /**
+     * get OrdererGenesis config.
+     *
+     * @return
+     */
+    public static OrdererGenesis getOrdererGenesis(List<Organization> organizationList) {
+        //init batchSize
+        Map<String, Object> batchSize = new HashMap<>();
+        batchSize.put("MaxMessageCount", 10);
+        batchSize.put("AbsoluteMaxBytes", "99 MB");
+        batchSize.put("PreferredMaxBytes", "512 KB");
+
+
+        // init orderer
+        Orderer orderer = new Orderer();
+        orderer.setOrdererType(OrdererTypeEnum.SOLO.getValue());
+        orderer.setAddresses(Arrays.asList(new Address("orderer.example.com", 7050)));
+        orderer.setBatchTimeout("2s");
+        orderer.setBatchSize(batchSize);
+        orderer.setMaxChannels(0);
+        orderer.setPolicies(PolicyFactory.getDefaultOrdererPolicy());
+        orderer.setOrganizations(organizationList);
+        orderer.setCapabilities(YamlService.getCommCapabilities());
+
+        //init Consortium
+        Map<String, Consortium> sampleConsortium = new HashMap<>();
+        sampleConsortium.put("SampleConsortium", new Consortium(organizationList));
+
+
+        //init OrdererGenesis config
+        OrdererGenesis ordererGenesis = new OrdererGenesis();
+        ordererGenesis.setOrderer(orderer);
+        ordererGenesis.setPolicies(PolicyFactory.getDefaultOrdererGenesisPolicy());
+        ordererGenesis.setCapabilities(YamlService.getCommCapabilities());
+        ordererGenesis.setConsortiums(sampleConsortium);
+
+
+        return ordererGenesis;
+    }
+
+
+    public static Channel getChannel(List<Organization> organizationList) {
+
+        //init application config
+        Application application = new Application();
+        application.setPolicies(PolicyFactory.getDefaultApplicationPolicy());
+        application.setOrganizations(organizationList);
+        application.setCapabilities(YamlService.getCommCapabilities());
+
+        //init channel config
+        Channel channel = new Channel();
+        channel.setConsortium("SampleConsortium");
+        channel.setPolicies(PolicyFactory.getDefaultChannelPolicy());
+        channel.setCapabilities(YamlService.getCommCapabilities());
+        channel.setApplication(application);
+
+        return channel;
+    }
+
+    public static Profiles getProfiles() {
+        //org list
+        List<Organization> organizationList = YamlService.getOrgConfig();
+
+        Profiles profiles = new Profiles();
+        profiles.setOrdererGenesis(YamlService.getOrdererGenesis(organizationList));
+        profiles.setChannelConfig(YamlService.getChannel(organizationList));
+        return profiles;
+    }
+
+
+    public static Map<String, Object> getConfigx() {
+        Map<String, Object> channelConfigYaml = new LinkedHashMap<>();
+        channelConfigYaml.put("Profiles", YamlService.getProfiles());
+
+        return channelConfigYaml;
     }
 
     public static void main(String args[]) {

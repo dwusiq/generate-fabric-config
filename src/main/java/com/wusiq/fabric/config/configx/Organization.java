@@ -20,5 +20,5 @@ public class Organization {
     @JsonProperty(value = "Policies")
     public Map<String, Policy> policies;
     @JsonProperty(value = "AnchorPeers")
-    public List<Node> anchorPeers;
+    public List<Address> anchorPeers;
 }
