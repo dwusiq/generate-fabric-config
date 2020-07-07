@@ -10,10 +10,7 @@ import lombok.Data;
 public class Profiles {
     @JsonProperty(value = "ApplicationChannel")
     private Channel applicationChannel;
-    @JsonProperty(value = "SoloOrdererGenesis")
-    private OrdererGenesis soloOrdererGenesis;
-    @JsonProperty(value = "KafkaOrdererGenesis")
-    private OrdererGenesis kafkaOrdererGenesis;
-    @JsonProperty(value = "EtcdRaftOrdererGenesis")
-    private OrdererGenesis etcdRaftOrdererGenesis;
+    //support solo/kafka/etcdraft
+    @JsonProperty(value = "OrdererGenesis")
+    private OrdererGenesis ordererGenesis;
 }

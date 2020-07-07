@@ -119,9 +119,9 @@ public class YamlService {
 
         Profiles profiles = new Profiles();
         profiles.setApplicationChannel(YamlService.getChannel(peerOrgList));
-//        profiles.setEtcdRaftOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.ETCDRAFT, peerOrgList, ordererOrgList));
-//        profiles.setKafkaOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.KAFKA, peerOrgList, ordererOrgList));
-        profiles.setSoloOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.SOLO, peerOrgList, ordererOrgList));
+//        profiles.setOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.ETCDRAFT, peerOrgList, ordererOrgList));
+//        profiles.setOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.KAFKA, peerOrgList, ordererOrgList));
+        profiles.setOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.SOLO, peerOrgList, ordererOrgList));
 
         return profiles;
     }
