@@ -2,6 +2,7 @@ package com.wusiq.fabric.config.configx;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map;
  * Orderer entity of configx.yaml config.
  */
 @Data
+@Accessors(chain= true)
 public class Orderer {
     @JsonProperty(value = "OrdererType")
     private String ordererType;
@@ -28,5 +30,7 @@ public class Orderer {
     @JsonProperty(value = "Capabilities")
     private Map<String, Boolean> capabilities;
     @JsonProperty(value = "Kafka")
-    private List<Map<String, Address>> Kafka;
+    private Map<String, List<Address>> Kafka;
+    @JsonProperty(value = "EtcdRaft")
+    private Map<String, List<EtcdRaftConsenter>> etcdRaft;
 }

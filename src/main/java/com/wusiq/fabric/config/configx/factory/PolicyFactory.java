@@ -37,10 +37,10 @@ public class PolicyFactory {
     }
 
     /**
-     * get default config of organization policy.
+     * get default config of peer organization policy.
      * @return
      */
-    public static Map<String, Policy> getDefaultOrganization(String mapId) {
+    public static Map<String, Policy> getDefaultPeerOrgPolicy(String mapId) {
         Map<String, Policy> policies = new LinkedHashMap<>();
         policies.put(POLICY_AUTHORITY_READERS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN_PEER_CLIENT.replace("MspID",mapId)));
         policies.put(POLICY_AUTHORITY_WRITERS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN_CLIENT.replace("MspID",mapId)));
@@ -48,6 +48,17 @@ public class PolicyFactory {
         return policies;
     }
 
+    /**
+     * get default config of orderer organization policy.
+     * @return
+     */
+    public static Map<String, Policy> getDefaultOrdererOrgPolicy(String mapId) {
+        Map<String, Policy> policies = new LinkedHashMap<>();
+        policies.put(POLICY_AUTHORITY_READERS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ORG_MEMBER.replace("MspID",mapId)));
+        policies.put(POLICY_AUTHORITY_WRITERS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ORG_MEMBER.replace("MspID",mapId)));
+        policies.put(POLICY_AUTHORITY_ADMINS, Policy.init(POLICY_TYPE_SIGNATURE, POLICY_RULE_OR_ADMIN.replace("MspID",mapId)));
+        return policies;
+    }
 
     /**
      * get default config of OrdererGenesis policy.

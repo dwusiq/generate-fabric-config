@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class YamlService {
@@ -37,7 +40,7 @@ public class YamlService {
         writer.close();
     }
 
-    public static List<Organization> getOrgConfig() {
+    public static List<Organization> getPeerOrgConfig() {
         Organization org1 = new Organization();
         String orgName = "Org1MSP";
         String anchorPeersHost = "peer0.org1.example.com";
@@ -47,7 +50,7 @@ public class YamlService {
         org1.setName(orgName);
         org1.setId(orgId);
         org1.setMspDir(mSPDir);
-        org1.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
+        org1.setPolicies(PolicyFactory.getDefaultPeerOrgPolicy(orgName));
         org1.setAnchorPeers(Arrays.asList(new Address(anchorPeersHost, anchorPeersPort)));
 
         orgName = "Org2MSP";
@@ -59,11 +62,25 @@ public class YamlService {
         org2.setName(orgName);
         org2.setId(orgId);
         org2.setMspDir(mSPDir);
-        org2.setPolicies(PolicyFactory.getDefaultOrganization(orgName));
+        org2.setPolicies(PolicyFactory.getDefaultPeerOrgPolicy(orgName));
         org2.setAnchorPeers(Arrays.asList(new Address(anchorPeersHost, anchorPeersPort)));
 
         return Arrays.asList(org1, org2);
     }
+
+    public static List<Organization> getOrdererOrgConfig() {
+        Organization ordererOrg = new Organization();
+        String orgName = "OrdererMSP";
+        String orgId = "OrdererMSP";
+        String mSPDir = "crypto-config/ordererOrganizations/example.com/msp";
+        ordererOrg.setName(orgName);
+        ordererOrg.setId(orgId);
+        ordererOrg.setMspDir(mSPDir);
+        ordererOrg.setPolicies(PolicyFactory.getDefaultOrdererOrgPolicy(orgName));
+
+        return Arrays.asList(ordererOrg);
+    }
+
 
     /**
      * get common  capabilities.
@@ -74,46 +91,6 @@ public class YamlService {
         LinkedHashMap<String, Boolean> map = new LinkedHashMap();
         map.put("V1_4_2", true);
         return map;
-    }
-
-    /**
-     * get OrdererGenesis config.
-     *
-     * @return
-     */
-    public static OrdererGenesis getOrdererGenesis(List<Organization> organizationList) {
-        //init batchSize
-        Map<String, Object> batchSize = new HashMap<>();
-        batchSize.put("MaxMessageCount", 10);
-        batchSize.put("AbsoluteMaxBytes", "99 MB");
-        batchSize.put("PreferredMaxBytes", "512 KB");
-
-
-        // init orderer
-        Orderer orderer = new Orderer();
-        orderer.setOrdererType(OrdererTypeEnum.SOLO.getValue());
-        orderer.setAddresses(Arrays.asList(new Address("orderer.example.com", 7050)));
-        orderer.setBatchTimeout("2s");
-        orderer.setBatchSize(batchSize);
-        orderer.setMaxChannels(0);
-        orderer.setPolicies(PolicyFactory.getDefaultOrdererPolicy());
-        orderer.setOrganizations(organizationList);
-        orderer.setCapabilities(YamlService.getCommCapabilities());
-
-        //init Consortium
-        Map<String, Consortium> sampleConsortium = new HashMap<>();
-        sampleConsortium.put("SampleConsortium", new Consortium(organizationList));
-
-
-        //init OrdererGenesis config
-        OrdererGenesis ordererGenesis = new OrdererGenesis();
-        ordererGenesis.setOrderer(orderer);
-        ordererGenesis.setPolicies(PolicyFactory.getDefaultOrdererGenesisPolicy());
-        ordererGenesis.setCapabilities(YamlService.getCommCapabilities());
-        ordererGenesis.setConsortiums(sampleConsortium);
-
-
-        return ordererGenesis;
     }
 
 
@@ -137,11 +114,15 @@ public class YamlService {
 
     public static Profiles getProfiles() {
         //org list
-        List<Organization> organizationList = YamlService.getOrgConfig();
+        List<Organization> peerOrgList = YamlService.getPeerOrgConfig();
+        List<Organization> ordererOrgList = YamlService.getOrdererOrgConfig();
 
         Profiles profiles = new Profiles();
-        profiles.setSoloOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.SOLO,organizationList));
-        profiles.setChannelConfig(YamlService.getChannel(organizationList));
+        profiles.setApplicationChannel(YamlService.getChannel(peerOrgList));
+//        profiles.setEtcdRaftOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.ETCDRAFT, peerOrgList, ordererOrgList));
+//        profiles.setKafkaOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.KAFKA, peerOrgList, ordererOrgList));
+        profiles.setSoloOrdererGenesis(OrdererGenesisFactory.getOrdererGenesisByType(OrdererTypeEnum.SOLO, peerOrgList, ordererOrgList));
+
         return profiles;
     }
 
