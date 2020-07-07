@@ -4,19 +4,80 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.wusiq.fabric.config.configx.*;
 import com.wusiq.fabric.config.configx.factory.OrdererGenesisFactory;
 import com.wusiq.fabric.config.configx.factory.PolicyFactory;
+import com.wusiq.fabric.config.container.CliYaml;
+import com.wusiq.fabric.config.container.OrdererYaml;
+import com.wusiq.fabric.config.container.PeerYaml;
+import com.wusiq.fabric.config.crypto.Crypto;
+import com.wusiq.fabric.config.crypto.OrdererOrg;
+import com.wusiq.fabric.config.crypto.PeerOrg;
 import com.wusiq.fabric.enums.OrdererTypeEnum;
+import com.wusiq.fabric.tools.ThymeleafUtil;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @Service
 public class YamlService {
+
+
+    public void writeSampleOrderer() throws IOException {
+        OrdererYaml orderer = new OrdererYaml();
+        orderer.setServiceHost("orderer.example.com");
+        orderer.setExtraHosts(Arrays.asList("\"peer0.org1.example.com:192.168.8.10\"", "\"peer1.org1.example.com:192.168.8.11\""));
+        orderer.setContainerName("kdfa23sda-orderer.example.com");
+        orderer.setImageTag("1.4.6");
+        orderer.setTlsEnabled(true);
+        orderer.setDockerNetwork("firstnetwork_byfn");
+//        orderer.setMspId("Org1MSP");
+//        orderer.setMspPath("./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp");
+//        orderer.setTlsPath("./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls");
+//        orderer.setPeerPort(7051);
+//        orderer.setGossipBootstrap("peer1.org1.example.com:8051");
+//        orderer.setChaincodeListenPort(7052);
+
+
+
+        Path yamlPath = Paths.get("./configs");
+        ThymeleafUtil.sampleOrdererConfig(yamlPath, orderer);
+    }
+
+
+    public void writeSamplePeer() throws IOException {
+        PeerYaml peerYaml = new PeerYaml();
+        peerYaml.setServiceHost("peer0.org1.example.com");
+        peerYaml.setExtraHosts(Arrays.asList("\"orderer.example.com:192.168.8.10\"", "\"peer1.org1.example.com:192.168.8.11\""));
+        peerYaml.setContainerName("kdfa23sda-peer0.org1.example.com");
+        peerYaml.setImageTag("1.4.6");
+        peerYaml.setTlsEnabled(true);
+        peerYaml.setDockerNetwork("firstnetwork_byfn");
+        peerYaml.setMspId("Org1MSP");
+        peerYaml.setMspPath("./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp");
+        peerYaml.setTlsPath("./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls");
+        peerYaml.setPeerPort(7051);
+        peerYaml.setGossipBootstrap("peer1.org1.example.com:8051");
+        peerYaml.setChaincodeListenPort(7052);
+
+
+        CliYaml cliYaml = new CliYaml();
+        cliYaml.setServiceHost("kdfa23sda-peer0-org1-cli");
+        cliYaml.setExtraHosts(Arrays.asList("\"orderer.example.com:192.168.8.10\"", "\"peer1.org1.example.com:192.168.8.11\""));
+        cliYaml.setContainerName("kdfa23sda-peer0-org1-cli");
+        cliYaml.setImageTag("1.4.6");
+        cliYaml.setTlsEnabled(true);
+        cliYaml.setDockerNetwork("firstnetwork_byfn");
+        cliYaml.setSystemChannelName("systemChannel");
+        cliYaml.setDependOnHosts(Arrays.asList("orderer.example.com", "peer1.org1.example.com"));
+
+
+        Path yamlPath = Paths.get("./configs");
+        ThymeleafUtil.samplePeerConfig(yamlPath, peerYaml, cliYaml);
+    }
+
 
     public void writeConfigx() throws IOException {
         Map<String, Object> configxYaml = YamlService.getConfigx();
@@ -25,13 +86,21 @@ public class YamlService {
         YamlService.writeYaml(configxYaml, yamlPath);
     }
 
-    public static void writeYaml(Map<String, Object> channelConfigYaml, String filepath) throws IOException {
+
+    public void writeCrypto() throws IOException {
+        Crypto cryptoYaml = YamlService.getCrypto();
+
+        String yamlPath = "./configs/crypto-config.yaml";
+        YamlService.writeYaml(cryptoYaml, yamlPath);
+    }
+
+    public static void writeYaml(Object obj, String filepath) throws IOException {
         File file = new File(filepath);
         // 创建文件
         file.createNewFile();
         // creates a FileWriter Object
         FileWriter writer = new FileWriter(file);
-        String jsonAsYaml = new YAMLMapper().writeValueAsString(channelConfigYaml);
+        String jsonAsYaml = new YAMLMapper().writeValueAsString(obj);
 
         writer.write(jsonAsYaml);
 
@@ -134,11 +203,48 @@ public class YamlService {
         return channelConfigYaml;
     }
 
+
+    public static Crypto getCrypto() {
+        //init OrdererOrg
+        Map<String, String> specs = new LinkedHashMap<>();
+        specs.put("Hostname", "orderer");
+
+        OrdererOrg ordererOrg = new OrdererOrg();
+        ordererOrg.setName("Orderer");
+        ordererOrg.setDomain("example.com");
+        ordererOrg.setEnableNodeOUs(true);
+        ordererOrg.setSpecs(Arrays.asList(specs));
+
+
+        //init PeerOrg
+        List<PeerOrg> list = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Map<String, Integer> template = new LinkedHashMap<>();
+            template.put("Count", 2);
+
+            PeerOrg peerOrg = new PeerOrg();
+            peerOrg.setName(String.format("Org%1s", i));
+            peerOrg.setDomain(String.format("org%1s.example.com", i));
+            peerOrg.setEnableNodeOUs(true);
+            peerOrg.setTemplate(template);
+            list.add(peerOrg);
+        }
+
+        Crypto crypto = new Crypto();
+        crypto.setOrdererOrgs(Arrays.asList(ordererOrg));
+        crypto.setPeerOrgs(list);
+
+        return crypto;
+    }
+
+
     public static void main(String args[]) {
         YamlService yamlService = new YamlService();
         try {
-            yamlService.writeConfigx();
-            // yamlService.readYaml();
+//            yamlService.writeConfigx();
+//            yamlService.writeCrypto();
+            yamlService.writeSamplePeer();
+            yamlService.writeSampleOrderer();
         } catch (IOException e) {
             e.printStackTrace();
         }

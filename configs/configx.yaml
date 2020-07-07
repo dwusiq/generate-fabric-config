@@ -1,0 +1,181 @@
+---
+Profiles:
+  ApplicationChannel:
+    Consortium: "SampleConsortium"
+    Policies:
+      Readers:
+        Type: "ImplicitMeta"
+        Rule: "ANY Readers"
+      Writers:
+        Type: "ImplicitMeta"
+        Rule: "ANY Writers"
+      Admins:
+        Type: "ImplicitMeta"
+        Rule: "MAJORITY Admins"
+    Capabilities:
+      V1_4_2: true
+    Application:
+      Policies:
+        Readers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Readers"
+        Writers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Writers"
+        Admins:
+          Type: "ImplicitMeta"
+          Rule: "MAJORITY Admins"
+      Capabilities:
+        V1_4_2: true
+      Organizations:
+      - Name: "Org1MSP"
+        ID: "Org1MSP"
+        MSPDir: "crypto-config/peerOrganizations/org1.example.com/msp"
+        Policies:
+          Readers:
+            Type: "Signature"
+            Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+          Writers:
+            Type: "Signature"
+            Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+          Admins:
+            Type: "Signature"
+            Rule: "OR(Org1MSP.admin)"
+        AnchorPeers:
+        - Host: "peer0.org1.example.com"
+          Port: 7051
+      - Name: "Org2MSP"
+        ID: "Org2MSP"
+        MSPDir: "crypto-config/peerOrganizations/org2.example.com/msp"
+        Policies:
+          Readers:
+            Type: "Signature"
+            Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+          Writers:
+            Type: "Signature"
+            Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+          Admins:
+            Type: "Signature"
+            Rule: "OR(Org2MSP.admin)"
+        AnchorPeers:
+        - Host: "peer0.org2.example.com"
+          Port: 7051
+  OrdererGenesis:
+    Policies:
+      Readers:
+        Type: "ImplicitMeta"
+        Rule: "ANY Readers"
+      Writers:
+        Type: "ImplicitMeta"
+        Rule: "ANY Writers"
+      Admins:
+        Type: "ImplicitMeta"
+        Rule: "MAJORITY Admins"
+    Capabilities:
+      V1_4_2: true
+    Orderer:
+      OrdererType: "solo"
+      Addresses:
+      - Host: "orderer.example.com"
+        Port: 7050
+      BatchTimeout: "2s"
+      BatchSize:
+        AbsoluteMaxBytes: "99 MB"
+        PreferredMaxBytes: "512 KB"
+        MaxMessageCount: 10
+      MaxChannels: 0
+      Policies:
+        Readers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Readers"
+        Writers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Writers"
+        Admins:
+          Type: "ImplicitMeta"
+          Rule: "MAJORITY Admins"
+        BlockValidation:
+          Type: "ImplicitMeta"
+          Rule: "ANY Writers"
+      Organizations:
+      - Name: "OrdererMSP"
+        ID: "OrdererMSP"
+        MSPDir: "crypto-config/ordererOrganizations/example.com/msp"
+        Policies:
+          Readers:
+            Type: "Signature"
+            Rule: "OR('OrdererMSP.member')"
+          Writers:
+            Type: "Signature"
+            Rule: "OR('OrdererMSP.member')"
+          Admins:
+            Type: "Signature"
+            Rule: "OR(OrdererMSP.admin)"
+        AnchorPeers: null
+      Capabilities:
+        V1_4_2: true
+      Kafka: null
+      EtcdRaft: null
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+        - Name: "Org1MSP"
+          ID: "Org1MSP"
+          MSPDir: "crypto-config/peerOrganizations/org1.example.com/msp"
+          Policies:
+            Readers:
+              Type: "Signature"
+              Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+            Writers:
+              Type: "Signature"
+              Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+            Admins:
+              Type: "Signature"
+              Rule: "OR(Org1MSP.admin)"
+          AnchorPeers:
+          - Host: "peer0.org1.example.com"
+            Port: 7051
+        - Name: "Org2MSP"
+          ID: "Org2MSP"
+          MSPDir: "crypto-config/peerOrganizations/org2.example.com/msp"
+          Policies:
+            Readers:
+              Type: "Signature"
+              Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+            Writers:
+              Type: "Signature"
+              Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+            Admins:
+              Type: "Signature"
+              Rule: "OR(Org2MSP.admin)"
+          AnchorPeers:
+          - Host: "peer0.org2.example.com"
+            Port: 7051
+    Application:
+      Policies:
+        Readers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Readers"
+        Writers:
+          Type: "ImplicitMeta"
+          Rule: "ANY Writers"
+        Admins:
+          Type: "ImplicitMeta"
+          Rule: "MAJORITY Admins"
+      Capabilities:
+        V1_4_2: true
+      Organizations:
+      - Name: "OrdererMSP"
+        ID: "OrdererMSP"
+        MSPDir: "crypto-config/ordererOrganizations/example.com/msp"
+        Policies:
+          Readers:
+            Type: "Signature"
+            Rule: "OR('OrdererMSP.member')"
+          Writers:
+            Type: "Signature"
+            Rule: "OR('OrdererMSP.member')"
+          Admins:
+            Type: "Signature"
+            Rule: "OR(OrdererMSP.admin)"
+        AnchorPeers: null

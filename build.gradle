@@ -22,7 +22,7 @@ repositories {
 def springboot_version = "2.1.15.RELEASE"
 List springboot = [
         "org.springframework.boot:spring-boot-starter-web:$springboot_version",
-
+        "org.springframework.boot:spring-boot-starter-thymeleaf:$springboot_version",
 ]
 
 
