@@ -10,4 +10,6 @@ public class ConfigtxYaml {
     private List<Organization> organizations;
     private List<EtcdRaftConsenter> consenters;
     private List<Address> brokers;
+    private String capabilityVersion;
+
 }

@@ -11,4 +11,5 @@ public class PeerOrg {
     private String domain;
     private Integer peerCount;
     private Integer userCount;
+    private Boolean enableNodeOUs;
 }

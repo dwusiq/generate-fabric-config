@@ -37,14 +37,14 @@ Organizations:
 
 Capabilities:
     Channel: &ChannelCapabilities
-        V1_4_3: true
+        [(${configtxYaml.capabilityVersion})]: true
         V1_3: false
         V1_1: false
     Orderer: &OrdererCapabilities
-        V1_4_2: true
+        [(${configtxYaml.capabilityVersion})]: true
         V1_1: false
     Application: &ApplicationCapabilities
-        V1_4_2: true
+        [(${configtxYaml.capabilityVersion})]: true
         V1_3: false
         V1_2: false
         V1_1: false

@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class YamlService {
@@ -41,13 +39,15 @@ public class YamlService {
         org1.setDomain("org1.example.com");
         org1.setPeerCount(2);
         org1.setUserCount(2);
+        org1.setEnableNodeOUs(true);
 
 
         PeerOrg org2 = new PeerOrg();
         org2.setName("Org2");
         org2.setDomain("org2.example.com");
-        org2.setPeerCount(2);
-        org2.setUserCount(2);
+        org2.setPeerCount(1);
+        org2.setUserCount(1);
+        org2.setEnableNodeOUs(true);
 
         //init Crypto
         CryptoYaml cryptoYaml = new CryptoYaml();
@@ -60,7 +60,6 @@ public class YamlService {
 
 
     public void writeConfigtxYaml(OrdererTypeEnum ordererType) throws IOException {
-
         //init org list
         Organization ordererOrg = new Organization();
         ordererOrg.setName("OrdererOrg");
@@ -86,6 +85,7 @@ public class YamlService {
         ConfigtxYaml configtxYaml = new ConfigtxYaml();
         configtxYaml.setOrganizations(Arrays.asList(ordererOrg, org1, org2));
         configtxYaml.setOrdererType(ordererType.getValue());
+        configtxYaml.setCapabilityVersion("V1_4_6");
 
 
         //init kafka or etcdraft
