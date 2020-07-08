@@ -10,6 +10,5 @@ public class BaseFabric {
     private String containerName;
     private String imageTag;
     private Boolean tlsEnabled;
-    private String dockerNetwork;
     private List<String> extraHosts;
 }

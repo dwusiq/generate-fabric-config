@@ -10,6 +10,7 @@ public class PeerYaml extends BaseFabric {
     private String mspId;
     private String mspPath;
     private String tlsPath;
+    private String dockerNetwork;
     private String gossipBootstrap;
     private Integer chaincodeListenPort;
 }

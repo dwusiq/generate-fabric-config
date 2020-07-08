@@ -14,9 +14,12 @@
 
 package com.wusiq.fabric.tools;
 
+import com.wusiq.fabric.config.configtx.ConfigtxYaml;
+import com.wusiq.fabric.config.container.CaYaml;
 import com.wusiq.fabric.config.container.CliYaml;
 import com.wusiq.fabric.config.container.OrdererYaml;
 import com.wusiq.fabric.config.container.PeerYaml;
+import com.wusiq.fabric.config.crypto.CryptoYaml;
 import org.apache.commons.lang3.tuple.Pair;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -36,6 +39,9 @@ public class ThymeleafUtil {
 
     public static final String SAMPLE_PEER_YML = "sample-peer-yml.tpl";
     public static final String SAMPLE_ORDERER_YML = "sample-orderer-yml.tpl";
+    public static final String SAMPLE_CA_YML = "sample-ca-yml.tpl";
+    public static final String SAMPLE_CONFIGTX_YML = "sample-configtx-yml.tpl";
+    public static final String SAMPLE_CRYPTO_YML = "sample-crypto-yml.tpl";
 
 
     /**
@@ -113,6 +119,33 @@ public class ThymeleafUtil {
                 Pair.of("orderer", orderer)
         );
         Files.write(nodeRoot.resolve("docker-compose-orderer.yml"), applicationYml.getBytes(), StandardOpenOption.CREATE);
+    }
+
+
+    public static void sampleCaConfig(Path nodeRoot, CaYaml caYaml) throws IOException {
+        String applicationYml = ThymeleafUtil.generate(
+                ThymeleafUtil.SAMPLE_CA_YML,
+                Pair.of("caYaml", caYaml)
+        );
+        Files.write(nodeRoot.resolve("docker-compose-ca-org1.yml"), applicationYml.getBytes(), StandardOpenOption.CREATE);
+    }
+
+
+    public static void sampleConfigtxConfig(Path nodeRoot, ConfigtxYaml configtxYaml) throws IOException {
+        String applicationYml = ThymeleafUtil.generate(
+                ThymeleafUtil.SAMPLE_CONFIGTX_YML,
+                Pair.of("configtxYaml", configtxYaml)
+        );
+        Files.write(nodeRoot.resolve("configtx.yml"), applicationYml.getBytes(), StandardOpenOption.CREATE);
+    }
+
+
+    public static void sampleCryptoConfig(Path nodeRoot, CryptoYaml cryptoYaml) throws IOException {
+        String applicationYml = ThymeleafUtil.generate(
+                ThymeleafUtil.SAMPLE_CRYPTO_YML,
+                Pair.of("crypto", cryptoYaml)
+        );
+        Files.write(nodeRoot.resolve("crypto-config.yaml"), applicationYml.getBytes(), StandardOpenOption.CREATE);
     }
 
 }

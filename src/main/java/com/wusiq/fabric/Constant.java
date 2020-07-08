@@ -1,8 +1,5 @@
 package com.wusiq.fabric;
 
-import com.wusiq.fabric.enums.PolicyAuthorityEnum;
-import com.wusiq.fabric.enums.PolicyTypeEnum;
-
 public class Constant {
 
 

@@ -1,19 +1,16 @@
-package com.wusiq.fabric.config.configx;
+package com.wusiq.fabric.config.configtx;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Node entity of configx.yaml config.
+ * Node entity of configtx.yaml config.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {
-    @JsonProperty(value = "Host")
     private String host;
-    @JsonProperty(value = "Port")
     private Integer port;
 }
