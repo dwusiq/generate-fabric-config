@@ -13,6 +13,7 @@ OrdererOrgs:
     [/]
 [/]
 
+PeerOrgs:
 [# th:each="peerOrg : ${crypto.peerOrgs}"]
   - Name: [(${peerOrg.name})]
     Domain: [(${peerOrg.domain})]
