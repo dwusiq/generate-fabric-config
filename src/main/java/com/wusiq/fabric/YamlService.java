@@ -185,7 +185,6 @@ public class YamlService {
     public static void main(String args[]) {
         YamlService yamlService = new YamlService();
         try {
-
             yamlService.writeCryptoConfig();
             yamlService.writeConfigtxYaml(OrdererTypeEnum.ETCDRAFT);
             yamlService.writeSampleCa();
