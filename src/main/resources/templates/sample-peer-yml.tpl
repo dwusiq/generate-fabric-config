@@ -12,6 +12,21 @@ networks:
   byfn:
 
 services:
+[# th:if="${peerYaml.stateDb}=='couchdb'"]
+  [(${peerYaml.couchDbServiceName})]:
+    container_name: [(${peerYaml.couchDbContainerName})]
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=[(${peerYaml.couchDbUser})]
+      - COUCHDB_PASSWORD=[(${peerYaml.couchDbPassword})]
+    volumes:
+      - /var/hyperledger/[(${peerYaml.couchDbServiceName})]:/opt/couchdb/data
+    ports:
+      - "[(${peerYaml.couchDbPort})]:[(${peerYaml.couchDbPort})]"
+    networks:
+      - byfn
+[/]
+
   [(${peerYaml.serviceHost})]:
     image: hyperledger/fabric-peer:[(${peerYaml.imageTag})]
     container_name: [(${peerYaml.containerName})]
@@ -34,15 +49,26 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+    [# th:if="${peerYaml.stateDb}=='couchdb'"]
+      - CORE_LEDGER_STATE_STATEDATABASE=[(${peerYaml.couchDbServiceName})]
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=[(${peerYaml.couchDbServiceName})]:[(${peerYaml.couchDbPort})]
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=[(${peerYaml.couchDbUser})]
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=[(${peerYaml.couchDbPassword})]
+    [/]
     volumes:
       - /var/run/:/host/var/run/
       - [(${peerYaml.mspPath})]:/etc/hyperledger/fabric/msp
       - [(${peerYaml.tlsPath})]:/etc/hyperledger/fabric/tls
       - [(${peerYaml.serviceHost})]:/var/hyperledger/production
+      - /var/hyperledger/[(${peerYaml.serviceHost})]:/var/hyperledger/production
     ports:
       - [(${peerYaml.peerPort})]:[(${peerYaml.peerPort})]
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
+  [# th:if="${peerYaml.stateDb}=='couchdb'"]
+    depends_on:
+      - [(${peerYaml.couchDbServiceName})]
+  [/]
     networks:
       - byfn
     extra_hosts: [# th:each="peerExtraHhost : ${peerYaml.extraHosts}"]

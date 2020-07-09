@@ -12,6 +12,21 @@ networks:
   byfn:
 
 services:
+
+  couchDb-peer0-org1:
+    container_name: couchDb-peer0-org1
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=couchAdmin
+      - COUCHDB_PASSWORD=couch123456
+    volumes:
+      - /var/hyperledger/couchDb-peer0-org1:/opt/couchdb/data
+    ports:
+      - "5984:5984"
+    networks:
+      - byfn
+
+
   peer0.org1.example.com:
     image: hyperledger/fabric-peer:1.4.6
     container_name: kdfa23sda-peer0.org1.example.com
@@ -34,15 +49,26 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+    
+      - CORE_LEDGER_STATE_STATEDATABASE=couchDb-peer0-org1
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchDb-peer0-org1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=couchAdmin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=couch123456
+    
     volumes:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
       - peer0.org1.example.com:/var/hyperledger/production
+      - /var/hyperledger/peer0.org1.example.com:/var/hyperledger/production
     ports:
       - 7051:7051
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
+  
+    depends_on:
+      - couchDb-peer0-org1
+  
     networks:
       - byfn
     extra_hosts: 

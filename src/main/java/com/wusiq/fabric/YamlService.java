@@ -13,6 +13,7 @@ import com.wusiq.fabric.config.crypto.OrdererOrg;
 import com.wusiq.fabric.config.crypto.PeerOrg;
 import com.wusiq.fabric.enums.OrdererTypeEnum;
 import com.wusiq.fabric.enums.OrgTypeEnum;
+import com.wusiq.fabric.enums.StateDatabaseEnum;
 import com.wusiq.fabric.tools.ThymeleafUtil;
 import org.springframework.stereotype.Service;
 
@@ -165,6 +166,13 @@ public class YamlService {
         peerYaml.setPeerPort(7051);
         peerYaml.setGossipBootstrap("peer1.org1.example.com:8051");
         peerYaml.setChaincodeListenPort(7052);
+        //couch db
+        peerYaml.setStateDb(StateDatabaseEnum.COUCHDB.getValue());
+        peerYaml.setCouchDbServiceName("couchDb-peer0-org1");
+        peerYaml.setCouchDbContainerName("couchDb-peer0-org1");
+        peerYaml.setCouchDbUser("couchAdmin");
+        peerYaml.setCouchDbPassword("couch123456");
+        peerYaml.setCouchDbPort(5984);
 
 
         CliYaml cliYaml = new CliYaml();

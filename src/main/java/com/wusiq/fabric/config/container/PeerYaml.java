@@ -13,4 +13,11 @@ public class PeerYaml extends BaseFabric {
     private String dockerNetwork;
     private String gossipBootstrap;
     private Integer chaincodeListenPort;
+    private String stateDb;
+    private String couchDbServiceName;
+    private String couchDbContainerName;
+    private String couchDbUser;
+    private String couchDbPassword;
+    private Integer couchDbPort;
+
 }
