@@ -194,7 +194,7 @@ public class YamlService {
         YamlService yamlService = new YamlService();
         try {
             yamlService.writeCryptoConfig();
-            yamlService.writeConfigtxYaml(OrdererTypeEnum.ETCDRAFT);
+            yamlService.writeConfigtxYaml(OrdererTypeEnum.SOLO);
             yamlService.writeSampleCa();
             yamlService.writeSamplePeer();
             yamlService.writeSampleOrderer();
