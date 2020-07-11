@@ -2,7 +2,7 @@
 
 SYS_CHANNEL="systemchannel"
 CHANNEL_NAME="mychannel"
-ORDERER_CONSENSUS_TYPE="solo"
+ORDERER_CONSENSUS_TYPE=""
 ORGS_STR=""
 
 
@@ -13,8 +13,8 @@ help() {
 Usage:
     -s <name of system channel>    Default systemchannel
     -c <name of new channel>     Default mychannel
-    -o <consensus-type> - the consensus-type of the ordering service: solo (default), kafka, or etcdraft
-    -m <names of org,example "Org1,Org2">
+    -o <consensus-type> - the consensus-type of the ordering service: solo, or etcdraft
+    -O <names of org,example "Org1,Org2">
     -h <help>
 EOF
 
@@ -24,7 +24,7 @@ exit 0
 
 parse_params()
 {
-while getopts "s:c:o:m:h" option;do
+while getopts "s:c:o:O:h" option;do
     case $option in
     s) SYS_CHANNEL=$OPTARG
     ;;
@@ -32,40 +32,11 @@ while getopts "s:c:o:m:h" option;do
     ;;
     o) ORDERER_CONSENSUS_TYPE=$OPTARG
     ;;
-    m) ORGS_STR=$OPTARG;;
+    O) ORGS_STR=$OPTARG;;
     h) help;;
     esac
 done
 }
-
-
-
-function generateCerts() {
-  which cryptogen
-  if [ "$?" -ne 0 ]; then
-    echo "cryptogen tool not found. exiting"
-    exit 1
-  fi
-  echo
-  echo "##########################################################"
-  echo "##### Generate certificates using cryptogen tool #########"
-  echo "##########################################################"
-
-  if [ -d "crypto-config" ]; then
-    rm -Rf crypto-config
-  fi
-  set -x
-  cryptogen generate --config=./crypto-config.yaml
-  res=$?
-  set +x
-  if [ $res -ne 0 ]; then
-    echo "Failed to generate certificates..."
-    exit 1
-  fi
-  echo
-  echo "generate certificates success"
-}
-
 
 
 
@@ -92,10 +63,6 @@ function generateChannelArtifacts() {
     configtxgen -profile MultiOrgsOrdererGenesis -channelID ${SYS_CHANNEL} -outputBlock ./channel-artifacts/genesis.block
   elif [ "${ORDERER_CONSENSUS_TYPE}" == "etcdraft" ]; then
     configtxgen -profile SampleMultiNodeEtcdRaft -channelID ${SYS_CHANNEL} -outputBlock ./channel-artifacts/genesis.block
-  else
-    set +x
-    echo "unrecognized CONSESUS_TYPE='${ORDERER_CONSENSUS_TYPE}'. exiting"
-    exit 1
   fi
   res=$?
   set +x
@@ -146,5 +113,4 @@ if [ "${ORGS_STR}" ==  "" ];then
     exit 1;
 fi
 
-generateCerts
 generateChannelArtifacts
